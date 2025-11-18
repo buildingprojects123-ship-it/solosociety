@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
             userId: true,
           },
         },
-        comments: [],
+        comments: false,
       },
     })
 
