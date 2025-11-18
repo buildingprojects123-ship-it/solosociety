@@ -187,7 +187,7 @@ export default function UserProfileView({
             {connectionStatus === 'ACCEPTED' ? (
               <Badge variant="primary">Connected</Badge>
             ) : connectionStatus === 'PENDING' ? (
-              <Badge variant="secondary">Request Sent</Badge>
+              <Badge variant="warning">Request Sent</Badge>
             ) : (
               <Button onClick={handleConnect} loading={isConnecting}>
                 Connect
