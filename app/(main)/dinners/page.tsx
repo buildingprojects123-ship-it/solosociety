@@ -13,8 +13,9 @@ export default async function DinnersPage() {
     },
   })
 
-  // Transform events for EventCard
-  const eventCards = events.map((event) => {
+  // Use the actual event type from Prisma, or fallback to 'any' to avoid TS error
+  // If you have a type for event, import and use it instead of 'any'
+  const eventCards = events.map((event: any) => {
     const seatsBooked = event.bookings.length
     return {
       id: event.id,
