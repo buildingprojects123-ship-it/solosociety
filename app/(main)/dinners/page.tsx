@@ -72,7 +72,7 @@ export default async function DinnersPage() {
         />
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {eventCards.map((event) => (
+          {eventCards.map((event: any) => (
             <EventCard key={event.id} event={event} />
           ))}
         </div>
