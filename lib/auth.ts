@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import { prisma } from './prisma'
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET || 'dev-secret-change-in-production',
+  secret: process.env.NEXTAUTH_SECRET || 'p4YglFkHVWrV6rZpZUo68vlHaHRuBsnPP9qxbjQfu/0=',
   debug: false,
   providers: [
     CredentialsProvider({
