@@ -112,16 +112,16 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
   const modalContent = (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md"
+        className="absolute inset-0 bg-black/80 backdrop-blur-md"
         onClick={onClose}
       />
-      <div className="relative z-[10000] bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="relative z-[10000] bg-card border border-white/10 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Create Post</h2>
+            <h2 className="text-2xl font-bold text-foreground">Create Post</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
+              className="text-muted-foreground hover:text-foreground text-2xl transition-colors"
             >
               ×
             </button>
@@ -129,18 +129,18 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="w-full">
-              <label className="label">Caption</label>
+              <label className="label text-foreground">Caption</label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Write a caption..."
                 rows={4}
-                className="input resize-none"
+                className="input resize-none bg-secondary/50 border-white/10 text-foreground placeholder:text-muted-foreground focus:border-primary/50"
               />
             </div>
 
             <div className="w-full">
-              <label className="label">Photo</label>
+              <label className="label text-foreground">Photo</label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -153,12 +153,12 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 transition-colors text-sm text-gray-600"
+                  className="w-full px-4 py-3 border-2 border-dashed border-white/10 rounded-lg hover:border-primary/50 hover:bg-white/5 transition-colors text-sm text-muted-foreground"
                 >
                   {imagePreview ? 'Change photo' : 'Select photo'}
                 </button>
                 {imagePreview && (
-                  <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-gray-200">
+                  <div className="relative w-full aspect-square rounded-lg overflow-hidden border border-white/10">
                     <Image
                       src={imagePreview}
                       alt="Preview"
@@ -166,7 +166,7 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
                       className="object-cover"
                     />
                     {content && (
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
                         <p className="text-white text-sm font-medium px-4 pb-4 w-full">
                           {content}
                         </p>
@@ -181,7 +181,7 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
                           fileInputRef.current.value = ''
                         }
                       }}
-                      className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70 z-10"
+                      className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70 z-10 backdrop-blur-sm"
                     >
                       <svg
                         className="w-5 h-5"
@@ -207,6 +207,7 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="Add location"
+              className="bg-secondary/50 border-white/10 text-foreground placeholder:text-muted-foreground focus:border-primary/50"
             />
 
             <div className="flex gap-3 pt-4">
@@ -214,13 +215,13 @@ export default function CreatePostModal({ isOpen, onClose }: CreatePostModalProp
                 type="button"
                 variant="secondary"
                 onClick={onClose}
-                className="flex-1"
+                className="flex-1 bg-white/5 hover:bg-white/10 border-white/10 text-foreground"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1"
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
                 loading={isLoading}
                 disabled={!content.trim() && !imageFile}
               >

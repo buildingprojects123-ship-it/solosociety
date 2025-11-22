@@ -26,20 +26,20 @@ export default function EventCard({ event }: EventCardProps) {
 
   return (
     <Link href={`/events/${event.id}`}>
-      <article className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-soft hover:shadow-medium transition-all duration-200 group cursor-pointer">
+      <article className="bg-card border border-white/5 rounded-xl overflow-hidden shadow-lg shadow-black/20 hover:shadow-primary/10 hover:border-primary/20 transition-all duration-300 group cursor-pointer">
         {/* Event Image */}
-        <div className="relative w-full aspect-video bg-gray-100 overflow-hidden">
+        <div className="relative w-full aspect-video bg-secondary/50 overflow-hidden">
           {event.imageUrl ? (
             <Image
               src={event.imageUrl}
               alt={event.title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+            <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
               <svg
-                className="w-16 h-16 text-primary-400"
+                className="w-16 h-16 text-muted-foreground/50"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -53,9 +53,12 @@ export default function EventCard({ event }: EventCardProps) {
               </svg>
             </div>
           )}
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+
           {isSoldOut && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-              <span className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center">
+              <span className="px-4 py-2 bg-red-500/20 text-red-200 border border-red-500/50 font-semibold rounded-lg backdrop-blur-md">
                 Sold Out
               </span>
             </div>
@@ -64,12 +67,12 @@ export default function EventCard({ event }: EventCardProps) {
 
         {/* Event Info */}
         <div className="p-4">
-          <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+          <h3 className="text-lg font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
             {event.title}
           </h3>
 
           <div className="space-y-2 mb-3">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -81,7 +84,7 @@ export default function EventCard({ event }: EventCardProps) {
               <span>{event.dateTime}</span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -100,15 +103,15 @@ export default function EventCard({ event }: EventCardProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-3 border-t border-white/5">
             <div className="flex items-center gap-4">
               <div className="text-sm">
-                <span className="text-gray-500">Seats: </span>
-                <span className={`font-medium ${isSoldOut ? 'text-red-600' : 'text-gray-900'}`}>
+                <span className="text-muted-foreground">Seats: </span>
+                <span className={`font-medium ${isSoldOut ? 'text-red-400' : 'text-foreground'}`}>
                   {seatsLeft} left
                 </span>
               </div>
-              <div className="text-sm font-semibold text-primary-600">{priceDisplay}</div>
+              <div className="text-sm font-semibold text-primary">{priceDisplay}</div>
             </div>
           </div>
         </div>

@@ -331,6 +331,90 @@ async function main() {
     }),
   ])
 
+  // Create places
+  const places = await Promise.all([
+    prisma.place.create({
+      data: {
+        id: 'place-1',
+        name: 'Café Mondegar',
+        city: 'Mumbai',
+        neighborhood: 'Colaba',
+        imageUrl: 'https://placehold.co/400x300/e5e7eb/6b7280?text=Mondegar',
+        vibeTags: JSON.stringify(['Chill', 'Work', 'Coffee']),
+        rating: 4.5,
+      },
+    }),
+    prisma.place.create({
+      data: {
+        id: 'place-2',
+        name: 'The Bombay Canteen',
+        city: 'Mumbai',
+        neighborhood: 'Lower Parel',
+        imageUrl: 'https://placehold.co/400x300/e5e7eb/6b7280?text=Canteen',
+        vibeTags: JSON.stringify(['Date', 'Dinner', 'Loud']),
+        rating: 4.8,
+      },
+    }),
+    prisma.place.create({
+      data: {
+        id: 'place-3',
+        name: 'Social',
+        city: 'Mumbai',
+        neighborhood: 'Bandra',
+        imageUrl: 'https://placehold.co/400x300/e5e7eb/6b7280?text=Social',
+        vibeTags: JSON.stringify(['Loud', 'Party', 'Sunset']),
+        rating: 4.2,
+      },
+    }),
+    prisma.place.create({
+      data: {
+        id: 'place-4',
+        name: 'Le15',
+        city: 'Mumbai',
+        neighborhood: 'Colaba',
+        imageUrl: 'https://placehold.co/400x300/e5e7eb/6b7280?text=Le15',
+        vibeTags: JSON.stringify(['Chill', 'Date', 'Study']),
+        rating: 4.6,
+      },
+    }),
+  ])
+
+  console.log(`Created ${places.length} places`)
+
+  // Create reviews
+  await Promise.all([
+    prisma.review.create({
+      data: {
+        userId: users[0].id,
+        placeId: places[0].id,
+        rating: 5,
+        content: 'Great for work/coffee',
+      },
+    }),
+    prisma.review.create({
+      data: {
+        userId: users[1].id,
+        placeId: places[0].id,
+        rating: 4,
+        content: 'Perfect vibe for studying',
+      },
+    }),
+    prisma.review.create({
+      data: {
+        userId: users[2].id,
+        placeId: places[1].id,
+        rating: 5,
+        content: 'Amazing food and atmosphere',
+      },
+    }),
+  ])
+
+  // Link posts to places
+  await prisma.post.update({
+    where: { id: posts[0].id },
+    data: { placeId: places[1].id },
+  })
+
   console.log('Seeding completed!')
 }
 

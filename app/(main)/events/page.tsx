@@ -67,8 +67,8 @@ export default async function EventsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Events</h1>
-        <p className="text-gray-600">Discover curated experiences in your city</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Events</h1>
+        <p className="text-muted-foreground">Discover curated experiences in your city</p>
       </div>
 
       {/* Filters */}

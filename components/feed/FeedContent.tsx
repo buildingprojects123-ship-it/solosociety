@@ -12,6 +12,11 @@ interface Post {
   content: string | null
   imageUrl: string | null
   location: string | null
+  place?: {
+    id: string
+    name: string
+    city: string
+  } | null
   createdAt: Date
   user: {
     id: string
@@ -63,6 +68,7 @@ export default function FeedContent({
     content: post.content || '',
     imageUrl: post.imageUrl,
     location: post.location,
+    place: post.place,
     createdAt: post.createdAt,
     user: post.user,
     likes: post.likes,
@@ -96,9 +102,9 @@ export default function FeedContent({
     friendsWhoWent:
       place.friendNames.length > 0
         ? place.friendNames.map((name, index) => ({
-            id: `${place.id}-${index}`,
-            name,
-          }))
+          id: `${place.id}-${index}`,
+          name,
+        }))
         : [{ id: `${place.id}-placeholder`, name: 'Friend' }],
     review: place.snippet,
     createdAt: new Date(),
@@ -112,10 +118,10 @@ export default function FeedContent({
   )
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-[470px] mx-auto space-y-4">
       {/* Stories Row */}
       {showStories && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <div className="bg-card border border-white/5 rounded-xl p-4 shadow-sm">
           <StoryRow />
         </div>
       )}
@@ -127,7 +133,7 @@ export default function FeedContent({
           description="Start following people or create your first post!"
         />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {allPosts.map((post) => (
             <PostCard key={post.id} post={post as any} currentUserId={currentUserId} />
           ))}

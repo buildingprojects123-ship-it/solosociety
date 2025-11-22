@@ -63,10 +63,10 @@ async function getSuggestedUsers(currentUserId?: string): Promise<SidebarSuggest
   const profiles = await prisma.profile.findMany({
     where: currentUserId
       ? {
-          userId: {
-            not: currentUserId,
-          },
-        }
+        userId: {
+          not: currentUserId,
+        },
+      }
       : undefined,
     orderBy: {
       createdAt: 'desc',
@@ -170,79 +170,28 @@ async function getWeekendEvents(): Promise<SidebarWeekendEvent[]> {
 }
 
 async function getFavoritePlaces(): Promise<SidebarFavoritePlace[]> {
-  const posts = await prisma.post.findMany({
-    where: {
-      location: {
-        not: null,
-      },
-    },
+  const places = await prisma.place.findMany({
+    take: 4,
     orderBy: {
-      createdAt: 'desc',
+      rating: 'desc',
     },
-    take: 100,
     include: {
-      user: {
-        include: {
-          profile: true,
-        },
+      _count: {
+        select: { posts: true },
       },
     },
   })
 
-  const placeMap = new Map<
-    string,
-    {
-      id: string
-      name: string
-      city: string | null
-      friendIds: Set<string>
-      friendNames: Set<string>
-    }
-  >()
-
-  posts.forEach((post) => {
-    const location = post.location?.trim()
-    if (!location) return
-
-    const slug = slugify(location)
-    if (!placeMap.has(slug)) {
-      placeMap.set(slug, {
-        id: slug,
-        name: location,
-        city: post.user.profile?.city ?? null,
-        friendIds: new Set(),
-        friendNames: new Set(),
-      })
-    }
-
-    const entry = placeMap.get(slug)
-    if (!entry) return
-    entry.friendIds.add(post.userId)
-    if (post.user.profile?.name) {
-      entry.friendNames.add(post.user.profile.name)
-    }
-  })
-
-  const favoritePlaces = Array.from(placeMap.values())
-    .sort((a, b) => b.friendIds.size - a.friendIds.size)
-    .slice(0, 4)
-    .map((place) => ({
-      id: place.id,
-      name: place.name,
-      city: place.city,
-      friends: place.friendIds.size,
-      friendNames: Array.from(place.friendNames),
-      href: '/places',
-      snippet:
-        place.friendIds.size === 0
-          ? 'Be the first to check in here'
-          : `${place.friendIds.size} friend${place.friendIds.size === 1 ? '' : 's'} mentioned this spot`,
-      tags: place.city ? [place.city] : ['Community'],
-      imageUrl: `https://source.boringavatars.com/beam/200/${encodeURIComponent(
-        place.name
-      )}?colors=2563eb,7dd3fc,0f172a`,
-    }))
-
-  return favoritePlaces
+  return places.map((place) => ({
+    id: place.id,
+    name: place.name,
+    city: place.city,
+    friends: place._count.posts, // Using posts count as proxy
+    friendNames: [], // TODO: Fetch actual friend names if needed
+    href: '/places',
+    snippet: `${place.rating} ★ • ${place.neighborhood || place.city}`,
+    tags: JSON.parse(place.vibeTags) as string[],
+    imageUrl: place.imageUrl,
+  }))
 }
 

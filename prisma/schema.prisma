@@ -21,6 +21,10 @@ model User {
   comments          Comment[]
   sentConnections   Connection[] @relation("ConnectionSender")
   receivedConnections Connection[] @relation("ConnectionReceiver")
+  reviews           Review[]
+  notifications     Notification[]
+  messages          Message[]
+  participations    Participant[]
 }
 
 model Profile {
@@ -49,6 +53,7 @@ model Event {
   createdBy       String
   createdAt       DateTime  @default(now())
   bookings        Booking[]
+  conversations   Conversation[]
 }
 
 model Booking {
@@ -69,6 +74,8 @@ model Post {
   content   String?
   imageUrl  String?
   location  String?
+  placeId   String?
+  place     Place?    @relation(fields: [placeId], references: [id])
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   likes     Like[]
@@ -110,3 +117,75 @@ model Connection {
   @@unique([senderId, receiverId])
 }
 
+model Place {
+  id           String   @id @default(cuid())
+  name         String
+  city         String
+  neighborhood String?
+  imageUrl     String
+  vibeTags     String // JSON array stored as string
+  rating       Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  posts        Post[]
+  reviews      Review[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  placeId   String
+  place     Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  rating    Int
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+  id        String        @id @default(cuid())
+  type      String        // ONE_TO_ONE, GROUP, EVENT, COMMUNITY
+  name      String?       // For groups/events
+  eventId   String?
+  event     Event?        @relation(fields: [eventId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  Message[]
+  participants Participant[]
+}
+
+model Participant {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  joinedAt       DateTime     @default(now())
+  lastReadAt     DateTime     @default(now())
+
+  @@unique([userId, conversationId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // LIKE, COMMENT, FOLLOW, JOIN_EVENT, MESSAGE
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

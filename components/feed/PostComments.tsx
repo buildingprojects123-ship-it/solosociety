@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { addComment } from '@/app/actions'
 
 interface PostCommentsProps {
   postId: string
@@ -35,7 +36,7 @@ export default function PostComments({ postId, comments: initialComments }: Post
       createdAt: new Date(),
       user: {
         profile: {
-          name: session.user.phone,
+          name: session.user.phone, // Fallback to phone if name not available in session
         },
       },
     }
@@ -45,23 +46,9 @@ export default function PostComments({ postId, comments: initialComments }: Post
     setNewComment('')
 
     try {
-      const response = await fetch('/api/posts/comment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, content: newComment }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setComments((prev) =>
-          prev.map((c) => (c.id === tempId ? data.comment : c))
-        )
-      } else {
-        // Remove temp comment on error
-        setComments((prev) => prev.filter((c) => c.id !== tempId))
-        setNewComment(newComment)
-      }
+      await addComment(postId, newComment)
     } catch (error) {
+      // Revert on error
       setComments((prev) => prev.filter((c) => c.id !== tempId))
       setNewComment(newComment)
     } finally {

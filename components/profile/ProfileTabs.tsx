@@ -156,19 +156,18 @@ export default function ProfileTabs({ activeTab, onTabChange, userId }: ProfileT
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-card border border-white/5 rounded-xl overflow-hidden shadow-lg shadow-black/20">
       {/* Tab Buttons */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-white/5">
         <div className="flex overflow-x-auto scrollbar-hide">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.id
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-white/5'
+                }`}
             >
               {tab.label}
             </button>
@@ -177,7 +176,7 @@ export default function ProfileTabs({ activeTab, onTabChange, userId }: ProfileT
       </div>
 
       {/* Tab Content */}
-      <div className="p-6">{renderTabContent()}</div>
+      <div className="p-6 bg-secondary/10">{renderTabContent()}</div>
     </div>
   )
 }

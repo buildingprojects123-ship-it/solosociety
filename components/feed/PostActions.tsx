@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { toggleLike } from '@/app/actions'
 
 interface PostActionsProps {
   postId: string
@@ -34,17 +35,7 @@ export default function PostActions({
     setLikeCount((prev) => (wasLiked ? prev - 1 : prev + 1))
 
     try {
-      const response = await fetch('/api/posts/like', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId }),
-      })
-
-      if (!response.ok) {
-        // Revert on error
-        setIsLiked(wasLiked)
-        setLikeCount((prev) => (wasLiked ? prev + 1 : prev - 1))
-      }
+      await toggleLike(postId)
     } catch (error) {
       // Revert on error
       setIsLiked(wasLiked)
@@ -76,7 +67,7 @@ export default function PostActions({
             </svg>
           ) : (
             <svg
-              className="w-6 h-6 text-gray-900"
+              className="w-6 h-6 text-foreground hover:text-red-500 transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -92,7 +83,7 @@ export default function PostActions({
         </button>
         <button
           onClick={onCommentClick}
-          className="text-gray-900 transition-colors"
+          className="text-foreground hover:text-primary transition-colors"
         >
           <svg
             className="w-6 h-6"
@@ -108,7 +99,7 @@ export default function PostActions({
             />
           </svg>
         </button>
-        <button className="text-gray-900 transition-colors">
+        <button className="text-foreground hover:text-primary transition-colors">
           <svg
             className="w-6 h-6"
             fill="none"
@@ -125,14 +116,14 @@ export default function PostActions({
         </button>
       </div>
       {likeCount > 0 && (
-        <p className="text-sm font-semibold text-gray-900 mb-1">
+        <p className="text-sm font-semibold text-foreground mb-1">
           {likeCount} {likeCount === 1 ? 'like' : 'likes'}
         </p>
       )}
       {commentCount > 0 && (
         <button
           onClick={onCommentClick}
-          className="text-sm text-gray-500 hover:text-gray-900 mb-1"
+          className="text-sm text-muted-foreground hover:text-foreground mb-1"
         >
           View all {commentCount} {commentCount === 1 ? 'comment' : 'comments'}
         </button>

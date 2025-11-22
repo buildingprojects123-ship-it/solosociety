@@ -7,6 +7,7 @@ import EventCard from '@/components/events/EventCard'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
 import EmptyState from '@/components/ui/EmptyState'
+import { createDirectConversation } from '@/app/actions/chat'
 
 type TabType = 'posts' | 'events' | 'dinners' | 'places'
 
@@ -49,6 +50,7 @@ export default function UserProfileView({
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<TabType>('posts')
   const [isConnecting, setIsConnecting] = useState(false)
+  const [isMessaging, setIsMessaging] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState(connection?.status || null)
 
   const interests = user.profile?.interests
@@ -74,6 +76,19 @@ export default function UserProfileView({
       alert('Something went wrong')
     } finally {
       setIsConnecting(false)
+    }
+  }
+
+  const handleMessage = async () => {
+    setIsMessaging(true)
+    try {
+      const conversationId = await createDirectConversation(user.id)
+      router.push(`/messages?id=${conversationId}`)
+    } catch (error) {
+      console.error('Failed to start conversation:', error)
+      alert('Failed to start conversation')
+    } finally {
+      setIsMessaging(false)
     }
   }
 
@@ -183,7 +198,14 @@ export default function UserProfileView({
               </div>
             </div>
           </div>
-          <div>
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={handleMessage}
+              loading={isMessaging}
+            >
+              Message
+            </Button>
             {connectionStatus === 'ACCEPTED' ? (
               <Badge variant="primary">Connected</Badge>
             ) : connectionStatus === 'PENDING' ? (
@@ -225,11 +247,10 @@ export default function UserProfileView({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
+                className={`px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.id
+                  ? 'border-primary-600 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 {tab.label} {tab.count > 0 && `(${tab.count})`}
               </button>

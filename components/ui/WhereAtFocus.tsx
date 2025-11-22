@@ -12,6 +12,7 @@ interface SoloSocietyFocusProps {
   glowColor?: string
   animationDuration?: number
   pauseBetweenAnimations?: number
+  animationInterval?: number | null // Time in seconds between animation cycles (null = continuous)
   className?: string
   textSize?: string
 }
@@ -25,27 +26,50 @@ const SoloSocietyFocus = ({
   glowColor = 'rgba(37, 99, 235, 0.6)', // primary-600 with opacity
   animationDuration = 0.5,
   pauseBetweenAnimations = 1,
+  animationInterval = null, // null = continuous, number = seconds between cycles
   className = '',
   textSize = 'text-3xl',
 }: SoloSocietyFocusProps) => {
   const words = sentence.split(separator)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null)
+  const [isAnimating, setIsAnimating] = useState(animationInterval === null ? true : true)
   const containerRef = useRef<HTMLDivElement>(null)
   const wordRefs = useRef<(HTMLSpanElement | null)[]>([])
   const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 })
 
+  // Handle animation cycling
   useEffect(() => {
-    if (!manualMode) {
+    if (!manualMode && isAnimating) {
       const interval = setInterval(
         () => {
-          setCurrentIndex((prev) => (prev + 1) % words.length)
+          setCurrentIndex((prev) => {
+            const next = (prev + 1) % words.length
+            // If we've completed a full cycle and animationInterval is set, stop animating
+            if (next === 0 && animationInterval !== null) {
+              setIsAnimating(false)
+              // Set to -1 to show all words
+              return -1
+            }
+            return next
+          })
         },
         (animationDuration + pauseBetweenAnimations) * 1000
       )
       return () => clearInterval(interval)
     }
-  }, [manualMode, animationDuration, pauseBetweenAnimations, words.length])
+  }, [manualMode, isAnimating, animationDuration, pauseBetweenAnimations, words.length, animationInterval])
+
+  // Handle interval-based animation restart
+  useEffect(() => {
+    if (!manualMode && animationInterval !== null && !isAnimating) {
+      const timeout = setTimeout(() => {
+        setIsAnimating(true)
+        setCurrentIndex(0)
+      }, animationInterval * 1000)
+      return () => clearTimeout(timeout)
+    }
+  }, [manualMode, animationInterval, isAnimating])
 
   useEffect(() => {
     if (currentIndex === null || currentIndex === -1) return
@@ -82,6 +106,7 @@ const SoloSocietyFocus = ({
     >
       {words.map((word, index) => {
         const isActive = index === currentIndex
+        const showAll = currentIndex === -1 // Show all words when not animating
 
         return (
           <span
@@ -89,13 +114,15 @@ const SoloSocietyFocus = ({
             ref={(el) => { wordRefs.current[index] = el }}
             className={`relative ${textSize} font-black cursor-pointer`}
             style={{
-              filter: manualMode
-                ? isActive
-                  ? 'blur(0px)'
-                  : `blur(${blurAmount}px)`
-                : isActive
-                ? 'blur(0px)'
-                : `blur(${blurAmount}px)`,
+              filter: showAll
+                ? 'blur(0px)' // Show all words clearly when not animating
+                : manualMode
+                  ? isActive
+                    ? 'blur(0px)'
+                    : `blur(${blurAmount}px)`
+                  : isActive
+                    ? 'blur(0px)'
+                    : `blur(${blurAmount}px)`,
               transition: `filter ${animationDuration}s ease`,
               // custom CSS variables:
               '--border-color': borderColor,
@@ -116,7 +143,7 @@ const SoloSocietyFocus = ({
           y: focusRect.y,
           width: focusRect.width,
           height: focusRect.height,
-          opacity: currentIndex >= 0 ? 1 : 0,
+          opacity: currentIndex >= 0 ? 1 : 0, // Hide when showing all words
         }}
         transition={{
           duration: animationDuration,

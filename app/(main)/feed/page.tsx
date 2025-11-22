@@ -37,6 +37,7 @@ export default async function FeedPage() {
         orderBy: { createdAt: 'asc' },
         take: 10,
       },
+      place: true,
     },
     take: 20,
   })

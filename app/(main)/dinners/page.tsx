@@ -1,6 +1,29 @@
 import { prisma } from '@/lib/prisma'
-import EventCard from '@/components/events/EventCard'
+import EventChromaGrid from '@/components/events/EventChromaGrid'
 import EmptyState from '@/components/ui/EmptyState'
+
+// Generate gradient colors based on event index
+const gradients = [
+  'linear-gradient(145deg, #3B82F6, #000)',
+  'linear-gradient(180deg, #10B981, #000)',
+  'linear-gradient(210deg, #F59E0B, #000)',
+  'linear-gradient(195deg, #EF4444, #000)',
+  'linear-gradient(225deg, #8B5CF6, #000)',
+  'linear-gradient(135deg, #06B6D4, #000)',
+  'linear-gradient(165deg, #EC4899, #000)',
+  'linear-gradient(120deg, #14B8A6, #000)',
+]
+
+const borderColors = [
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#EF4444',
+  '#8B5CF6',
+  '#06B6D4',
+  '#EC4899',
+  '#14B8A6',
+]
 
 export default async function DinnersPage() {
   // TODO: Filter for "Dinner With Strangers" events specifically
@@ -13,14 +36,17 @@ export default async function DinnersPage() {
     },
   })
 
-  // Use the actual event type from Prisma, or fallback to 'any' to avoid TS error
-  // If you have a type for event, import and use it instead of 'any'
-  const eventCards = events.map((event: any) => {
+  // Transform events for ChromaGrid
+  const chromaEvents = events.map((event, index) => {
     const seatsBooked = event.bookings.length
+    const seatsLeft = event.maxSeats - seatsBooked
+    const gradientIndex = index % gradients.length
+
     return {
       id: event.id,
+      image: event.imageUrl || 'https://placehold.co/400x300/e5e7eb/6b7280?text=Dinner',
       title: event.title,
-      description: event.description,
+      subtitle: event.description || 'Dinner experience',
       dateTime: new Date(event.dateTime).toLocaleString('en-IN', {
         weekday: 'short',
         month: 'short',
@@ -28,13 +54,12 @@ export default async function DinnersPage() {
         hour: 'numeric',
         minute: '2-digit',
       }),
-      locationName: event.locationName,
-      locationAddress: event.locationAddress,
-      imageUrl: event.imageUrl,
-      maxSeats: event.maxSeats,
-      bookedSeats: seatsBooked,
-      price: event.price,
-      status: event.status,
+      location: event.locationName,
+      price: event.price === 0 ? 'Free' : `₹${event.price}`,
+      seatsLeft,
+      borderColor: borderColors[gradientIndex],
+      gradient: gradients[gradientIndex],
+      url: `/events/${event.id}`,
     }
   })
 
@@ -45,18 +70,18 @@ export default async function DinnersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dinner With Strangers</h1>
-        <p className="text-gray-600">Curated dinner experiences with interesting people</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Dinner With Strangers</h1>
+        <p className="text-muted-foreground">Curated dinner experiences with interesting people</p>
       </div>
 
       {/* Theme Filter */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+      <div className="bg-card border border-white/5 rounded-xl p-4 shadow-sm">
+        <label className="block text-sm font-medium text-muted-foreground mb-2">Theme</label>
         <div className="flex flex-wrap gap-2">
           {themes.map((theme) => (
             <button
               key={theme}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors border border-white/5 hover:border-white/10"
             >
               {theme}
             </button>
@@ -64,18 +89,20 @@ export default async function DinnersPage() {
         </div>
       </div>
 
-      {/* Events Grid */}
-      {eventCards.length === 0 ? (
+      {/* Events ChromaGrid */}
+      {chromaEvents.length === 0 ? (
         <EmptyState
           title="No dinners scheduled"
           description="Check back soon for new dinner experiences!"
         />
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {eventCards.map((event: any) => (
-            <EventCard key={event.id} event={event} />
-          ))}
-        </div>
+        <EventChromaGrid
+          events={chromaEvents}
+          radius={400}
+          damping={0.45}
+          fadeOut={0.6}
+          ease="power3.out"
+        />
       )}
     </div>
   )

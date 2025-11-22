@@ -115,117 +115,124 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Profile Card */}
-      <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{formData.name}</h1>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              {formData.age && <span>Age: {formData.age}</span>}
-              <span>📍 {formData.city}</span>
-              {session?.user?.phone && <span>📱 {session.user.phone}</span>}
-            </div>
-          </div>
-          {!isEditing && (
-            <Button variant="secondary" onClick={() => setIsEditing(true)}>
-              Edit
-            </Button>
-          )}
-        </div>
+      <div className="bg-card border border-white/5 rounded-xl p-6 md:p-8 shadow-lg shadow-black/20 relative overflow-hidden">
+        {/* Background Glow */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-        {isEditing ? (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              <Input
-                id="name"
-                type="text"
-                label="Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-              <Input
-                id="age"
-                type="number"
-                label="Age"
-                value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                min="18"
-                max="100"
-              />
-            </div>
-
-            <Input
-              id="city"
-              type="text"
-              label="City"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              required
-            />
-
+        <div className="relative z-10">
+          <div className="flex justify-between items-start mb-6">
             <div>
-              <label className="label">
-                Interests{' '}
-                <span className="text-gray-500 font-normal">
-                  ({formData.interests.length}/3 selected)
-                </span>
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {INTERESTS.map((interest) => {
-                  const isSelected = formData.interests.includes(interest)
-                  const isDisabled = !isSelected && formData.interests.length >= 3
-                  return (
-                    <button
-                      key={interest}
-                      type="button"
-                      onClick={() => handleInterestToggle(interest)}
-                      disabled={isDisabled}
-                      className={`px-4 py-3 rounded-lg border-2 transition-all duration-200 font-medium ${
-                        isSelected
-                          ? 'bg-primary-600 text-white border-primary-600'
-                          : isDisabled
-                          ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-primary-500'
-                      }`}
-                    >
-                      {interest}
-                    </button>
-                  )
-                })}
+              <h1 className="text-3xl font-bold text-foreground mb-2">{formData.name}</h1>
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                {formData.age && <span>Age: {formData.age}</span>}
+                <span>📍 {formData.city}</span>
+                {session?.user?.phone && <span>📱 {session.user.phone}</span>}
               </div>
             </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button type="submit" className="flex-1" loading={loading}>
-                Save Changes
+            {!isEditing && (
+              <Button variant="secondary" onClick={() => setIsEditing(true)} className="bg-white/5 hover:bg-white/10 border-white/10 text-foreground">
+                Edit
               </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                className="flex-1"
-                onClick={() => {
-                  setIsEditing(false)
-                  fetchProfile()
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <div>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Interests
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {formData.interests.map((interest) => (
-                <Badge key={interest} variant="primary">
-                  {interest}
-                </Badge>
-              ))}
-            </div>
+            )}
           </div>
-        )}
+
+          {isEditing ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <Input
+                  id="name"
+                  type="text"
+                  label="Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="bg-secondary/50 border-white/10 text-foreground focus:border-primary/50"
+                />
+                <Input
+                  id="age"
+                  type="number"
+                  label="Age"
+                  value={formData.age}
+                  onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                  min="18"
+                  max="100"
+                  className="bg-secondary/50 border-white/10 text-foreground focus:border-primary/50"
+                />
+              </div>
+
+              <Input
+                id="city"
+                type="text"
+                label="City"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                required
+                className="bg-secondary/50 border-white/10 text-foreground focus:border-primary/50"
+              />
+
+              <div>
+                <label className="label text-foreground">
+                  Interests{' '}
+                  <span className="text-muted-foreground font-normal">
+                    ({formData.interests.length}/3 selected)
+                  </span>
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {INTERESTS.map((interest) => {
+                    const isSelected = formData.interests.includes(interest)
+                    const isDisabled = !isSelected && formData.interests.length >= 3
+                    return (
+                      <button
+                        key={interest}
+                        type="button"
+                        onClick={() => handleInterestToggle(interest)}
+                        disabled={isDisabled}
+                        className={`px-4 py-3 rounded-lg border transition-all duration-200 font-medium ${isSelected
+                            ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20'
+                            : isDisabled
+                              ? 'bg-secondary/30 text-muted-foreground border-white/5 cursor-not-allowed opacity-50'
+                              : 'bg-secondary/50 text-foreground border-white/10 hover:border-primary/50 hover:bg-secondary/80'
+                          }`}
+                      >
+                        {interest}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="submit" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20" loading={loading}>
+                  Save Changes
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="flex-1 bg-white/5 hover:bg-white/10 border-white/10 text-foreground"
+                  onClick={() => {
+                    setIsEditing(false)
+                    fetchProfile()
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                Interests
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {formData.interests.map((interest) => (
+                  <Badge key={interest} variant="primary" className="bg-primary/10 text-primary border-primary/20">
+                    {interest}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}

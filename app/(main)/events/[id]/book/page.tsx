@@ -47,16 +47,16 @@ export default async function BookEventPage({
   if (seatsRemaining <= 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-md p-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="bg-card border border-white/5 rounded-xl shadow-lg shadow-black/20 p-6 text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4">
             Event Sold Out
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-muted-foreground mb-6">
             Sorry, all seats for this event have been booked.
           </p>
           <a
             href="/events"
-            className="inline-block bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block bg-primary text-primary-foreground py-2 px-6 rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
           >
             Browse Other Events
           </a>
@@ -67,22 +67,23 @@ export default async function BookEventPage({
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Confirm Booking</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">Confirm Booking</h2>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-        <div className="relative h-48 w-full">
+      <div className="bg-card border border-white/5 rounded-xl shadow-lg shadow-black/20 overflow-hidden mb-6">
+        <div className="relative h-48 w-full bg-secondary/50">
           <Image
             src={event.imageUrl}
             alt={event.title}
             fill
             className="object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
         </div>
         <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-semibold text-foreground mb-2">
             {event.title}
           </h3>
-          <div className="space-y-1 text-sm text-gray-600">
+          <div className="space-y-1 text-sm text-muted-foreground">
             <p>
               📅{' '}
               {new Date(event.dateTime).toLocaleDateString('en-IN', {
