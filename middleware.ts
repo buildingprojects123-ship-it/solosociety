@@ -19,6 +19,7 @@ export default withAuth(
         return !!token
       },
     },
+    secret: process.env.NEXTAUTH_SECRET || 'p4YglFkHVWrV6rZpZUo68vlHaHRuBsnPP9qxbjQfu/0=',
   }
 )
 
