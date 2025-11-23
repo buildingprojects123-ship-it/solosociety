@@ -15,21 +15,44 @@ export const authOptions: NextAuthOptions = {
         otp: { label: 'OTP', type: 'text' },
       },
       async authorize(credentials) {
-        console.log('Authorize called with:', { phone: credentials?.phone, otp: credentials?.otp })
+        console.log('=== AUTHORIZE CALLED ===')
+        console.log('Credentials received:', {
+          phone: credentials?.phone,
+          otp: credentials?.otp,
+          otpLength: credentials?.otp?.length,
+          otpType: typeof credentials?.otp
+        })
+        console.log('MOCK_OTP constant:', {
+          value: MOCK_OTP,
+          length: MOCK_OTP.length,
+          type: typeof MOCK_OTP
+        })
 
         if (!credentials?.phone || !credentials?.otp) {
-          console.log('Missing credentials')
+          console.log('❌ Missing credentials')
           return null
         }
 
         const phone = credentials.phone.trim()
         const otp = credentials.otp.trim()
 
+        console.log('After trim:', { phone, otp, otpLength: otp.length })
+        console.log('Comparison:', {
+          otp,
+          MOCK_OTP,
+          areEqual: otp === MOCK_OTP,
+          strictEqual: otp === '000000'
+        })
+
         // Mock OTP validation
         if (otp !== MOCK_OTP) {
-          console.log(`Invalid OTP provided: ${otp}. Expected: ${MOCK_OTP}`)
+          console.log(`❌ Invalid OTP provided: "${otp}" (length: ${otp.length}). Expected: "${MOCK_OTP}" (length: ${MOCK_OTP.length})`)
+          console.log('Character codes - provided:', otp.split('').map(c => c.charCodeAt(0)))
+          console.log('Character codes - expected:', MOCK_OTP.split('').map(c => c.charCodeAt(0)))
           return null
         }
+
+        console.log('✅ OTP validation passed!')
 
         try {
           // Find or create user
