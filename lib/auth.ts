@@ -2,6 +2,7 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import { prisma } from './prisma'
+import { MOCK_OTP } from './constants'
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || 'p4YglFkHVWrV6rZpZUo68vlHaHRuBsnPP9qxbjQfu/0=',
@@ -14,29 +15,55 @@ export const authOptions: NextAuthOptions = {
         otp: { label: 'OTP', type: 'text' },
       },
       async authorize(credentials) {
+        console.log('Authorize called with:', { phone: credentials?.phone, otp: credentials?.otp })
+
         if (!credentials?.phone || !credentials?.otp) {
+          console.log('Missing credentials')
           return null
         }
 
-        // Mock OTP validation - accept 000000 for any phone
-        if (credentials.otp !== '000000') {
+        const phone = credentials.phone.trim()
+        const otp = credentials.otp.trim()
+
+        // Mock OTP validation
+        if (otp !== MOCK_OTP) {
+          console.log(`Invalid OTP provided: ${otp}. Expected: ${MOCK_OTP}`)
           return null
         }
 
-        // Find or create user
-        let user = await prisma.user.findUnique({
-          where: { phone: credentials.phone },
-        })
-
-        if (!user) {
-          user = await prisma.user.create({
-            data: { phone: credentials.phone },
+        try {
+          // Find or create user
+          let user = await prisma.user.findUnique({
+            where: { phone },
           })
-        }
 
-        return {
-          id: user.id,
-          phone: user.phone,
+          if (!user) {
+            console.log('Creating new user for phone:', phone)
+            user = await prisma.user.create({
+              data: { phone },
+            })
+          } else {
+            console.log('Found existing user:', user.id)
+          }
+
+          return {
+            id: user.id,
+            phone: user.phone,
+          }
+        } catch (error) {
+          console.error('Database error in authorize:', error)
+          // If create failed because of race condition (unique constraint), try finding again
+          if ((error as any).code === 'P2002') {
+            try {
+              const user = await prisma.user.findUnique({
+                where: { phone },
+              })
+              if (user) return { id: user.id, phone: user.phone }
+            } catch (retryError) {
+              console.error('Retry find failed:', retryError)
+            }
+          }
+          return null
         }
       },
     }),
@@ -71,4 +98,3 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
 }
-
