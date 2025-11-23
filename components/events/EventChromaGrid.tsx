@@ -28,6 +28,19 @@ interface EventChromaGridProps {
   ease?: string
 }
 
+// Format ISO date string to readable format
+const formatEventDate = (isoString: string): string => {
+  const date = new Date(isoString)
+  return date.toLocaleString('en-IN', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
+
 const EventChromaGrid = ({
   events,
   className = '',
@@ -160,7 +173,7 @@ const EventChromaGrid = ({
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span>{event.dateTime}</span>
+                <span>{formatEventDate(event.dateTime)}</span>
               </div>
               <div className="flex items-center gap-2 text-xs opacity-85">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

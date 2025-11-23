@@ -42,18 +42,16 @@ export default async function EventsPage() {
     const seatsLeft = event.maxSeats - seatsBooked
     const gradientIndex = index % gradients.length
 
+    // Format date consistently to avoid hydration issues
+    const eventDate = new Date(event.dateTime)
+    const dateTimeString = eventDate.toISOString()
+
     return {
       id: event.id,
       image: event.imageUrl || 'https://placehold.co/400x300/e5e7eb/6b7280?text=Event',
       title: event.title,
       subtitle: event.description || 'Curated experience',
-      dateTime: new Date(event.dateTime).toLocaleString('en-IN', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      }),
+      dateTime: dateTimeString,
       location: event.locationName,
       price: event.price === 0 ? 'Free' : `₹${event.price}`,
       seatsLeft,
