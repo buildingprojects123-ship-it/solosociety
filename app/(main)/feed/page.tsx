@@ -13,36 +13,38 @@ export default async function FeedPage() {
 
   // TODO: Fetch posts with proper typing for different post types
   // For now, we'll fetch regular posts and transform them
-  const posts = await prisma.post.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      user: {
-        include: {
-          profile: true,
-        },
-      },
-      likes: {
-        select: {
-          userId: true,
-        },
-      },
-      comments: {
-        include: {
-          user: {
-            include: {
-              profile: true,
-            },
+  // Fetch posts and sidebar data in parallel
+  const [posts, sidebarData] = await Promise.all([
+    prisma.post.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          include: {
+            profile: true,
           },
         },
-        orderBy: { createdAt: 'asc' },
-        take: 10,
+        likes: {
+          select: {
+            userId: true,
+          },
+        },
+        comments: {
+          include: {
+            user: {
+              include: {
+                profile: true,
+              },
+            },
+          },
+          orderBy: { createdAt: 'asc' },
+          take: 10,
+        },
+        place: true,
       },
-      place: true,
-    },
-    take: 20,
-  })
-
-  const sidebarData = await getSidebarData(session.user.id)
+      take: 20,
+    }),
+    getSidebarData(session.user.id)
+  ])
 
   return (
     <FeedContent

@@ -51,7 +51,7 @@ export default function PostActions({
         <button
           onClick={handleLike}
           disabled={isLoading || !session}
-          className="transition-colors"
+          className="transition-colors p-2 -ml-2"
         >
           {isLiked ? (
             <svg
@@ -83,7 +83,7 @@ export default function PostActions({
         </button>
         <button
           onClick={onCommentClick}
-          className="text-foreground hover:text-primary transition-colors"
+          className="text-foreground hover:text-primary transition-colors p-2"
         >
           <svg
             className="w-6 h-6"
@@ -99,7 +99,7 @@ export default function PostActions({
             />
           </svg>
         </button>
-        <button className="text-foreground hover:text-primary transition-colors">
+        <button className="text-foreground hover:text-primary transition-colors p-2">
           <svg
             className="w-6 h-6"
             fill="none"

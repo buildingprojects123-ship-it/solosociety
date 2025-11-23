@@ -132,9 +132,31 @@ export async function createDirectConversation(targetUserId: string) {
     if (!session?.user?.id) throw new Error('Unauthorized')
 
     // Check if conversation already exists
-    // This is a bit complex in Prisma without a direct many-to-many check, 
-    // but for now we'll just create a new one or find one where both are participants.
-    // A proper implementation would check for an existing ONE_TO_ONE conversation with these exact 2 participants.
+    const existingConversations = await prisma.conversation.findMany({
+        where: {
+            type: 'ONE_TO_ONE',
+            participants: {
+                every: {
+                    userId: {
+                        in: [session.user.id, targetUserId]
+                    }
+                }
+            }
+        },
+        include: {
+            participants: true
+        }
+    })
+
+    // Filter to ensure exact match (only these 2 participants)
+    const existingConversation = existingConversations.find(
+        conv => conv.participants.length === 2 &&
+            conv.participants.every(p => [session.user.id, targetUserId].includes(p.userId))
+    )
+
+    if (existingConversation) {
+        return existingConversation.id
+    }
 
     const conversation = await prisma.conversation.create({
         data: {

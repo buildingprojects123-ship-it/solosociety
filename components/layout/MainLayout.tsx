@@ -21,54 +21,33 @@ export default function MainLayout({ children }: MainLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary-500/30">
-      {/* Desktop / Tablet Layout */}
-      <div className="hidden lg:flex lg:flex-col h-screen overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary-500/30 pb-16 lg:pb-0">
+      {/* Top Navigation - Fixed on Mobile/Tablet */}
+      <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-white/5 lg:relative lg:border-none">
         <TopNav />
-        <div className="flex-1 flex overflow-hidden">
-          <div className={`max-w-[1400px] mx-auto w-full flex gap-6 ${isMessagesPage ? 'p-0' : 'px-6 py-6'}`}>
-            {/* Left Sidebar - Fixed */}
-            <div className="hidden lg:block w-[260px] flex-shrink-0">
-              <div className="h-full overflow-y-auto scrollbar-hide">
-                <LeftSidebar />
-              </div>
-            </div>
+      </div>
 
-            {/* Main Content - Scrollable */}
-            <main className="flex-1 min-w-0 overflow-y-auto scrollbar-hide">
-              {children}
-            </main>
+      <div className="max-w-[1400px] mx-auto w-full flex justify-center lg:gap-6 lg:px-6 lg:py-6">
+        {/* Left Sidebar - Desktop Only */}
+        <aside className="hidden lg:block w-[260px] flex-shrink-0 sticky top-[104px] h-[calc(100vh-128px)] overflow-y-auto scrollbar-hide">
+          <LeftSidebar />
+        </aside>
 
-            {/* Right Sidebar - Fixed */}
-            {!isMessagesPage && (
-              <div className="hidden xl:block w-[340px] flex-shrink-0">
-                <div className="h-full overflow-y-auto scrollbar-hide">
-                  <RightSidebar />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Main Content */}
+        <main className={`flex-1 min-w-0 w-full max-w-2xl ${isMessagesPage ? 'p-0' : 'px-4 py-4 lg:p-0'}`}>
+          {children}
+        </main>
 
-        {/* Inline widgets for narrower desktops (no XL screen) */}
+        {/* Right Sidebar - Desktop Only */}
         {!isMessagesPage && (
-          <div className="hidden lg:block xl:hidden overflow-y-auto">
-            <div className="max-w-2xl mx-auto px-6 pb-6">
-              <RightSidebar variant="inline" />
-            </div>
-          </div>
+          <aside className="hidden xl:block w-[340px] flex-shrink-0 sticky top-[104px] h-[calc(100vh-128px)] overflow-y-auto scrollbar-hide">
+            <RightSidebar />
+          </aside>
         )}
       </div>
 
-      {/* Mobile Layout */}
-      <div className="lg:hidden flex flex-col min-h-screen">
-        <TopNav />
-        <main className="flex-1 overflow-y-auto pb-20">
-          <div className="px-4 py-6 space-y-6">
-            {children}
-            {!isMessagesPage && <RightSidebar variant="inline" />}
-          </div>
-        </main>
+      {/* Bottom Navigation - Mobile/Tablet Only */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-white/10 bg-black/90 backdrop-blur-lg safe-area-bottom">
         <BottomNav />
       </div>
     </div>

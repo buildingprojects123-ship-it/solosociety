@@ -3,9 +3,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
     try {
-        // @ts-ignore - conversations relation exists in schema but Prisma client may not be regenerated
+
         const events = await prisma.event.findMany({
             include: {
+                // @ts-ignore - conversations relation exists in schema
                 conversations: true,
                 bookings: true,
             },
@@ -14,11 +15,14 @@ export async function GET() {
         let createdCount = 0
 
         for (const event of events) {
+
             // @ts-ignore - conversations property exists at runtime
             console.log(`Processing event: ${event.id}, conversations: ${event.conversations?.length}`)
+
             // @ts-ignore - conversations property exists at runtime
             if (!event.conversations || event.conversations.length === 0) {
                 // Collect participant IDs - only from bookings since createdBy might not be a user ID
+
                 // @ts-ignore - bookings property exists at runtime
                 const participantIds = new Set(event.bookings.map((b: any) => b.userId))
 
@@ -31,6 +35,7 @@ export async function GET() {
                 console.log(`Creating conversation for ${event.title} with ${participantIds.size} participants`)
 
                 if (participantIds.size > 0) {
+
                     // @ts-ignore - conversation model exists in schema
                     await prisma.conversation.create({
                         data: {

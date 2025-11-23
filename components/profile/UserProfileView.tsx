@@ -183,7 +183,7 @@ export default function UserProfileView({
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Profile Card */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 md:p-8">
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between mb-6 gap-6 md:gap-0">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
               <span className="text-white text-3xl font-bold">{userInitial}</span>
@@ -198,23 +198,26 @@ export default function UserProfileView({
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              onClick={handleMessage}
-              loading={isMessaging}
-            >
-              Message
-            </Button>
-            {connectionStatus === 'ACCEPTED' ? (
-              <Badge variant="primary">Connected</Badge>
-            ) : connectionStatus === 'PENDING' ? (
-              <Badge variant="warning">Request Sent</Badge>
-            ) : (
-              <Button onClick={handleConnect} loading={isConnecting}>
-                Connect
+          <div className="flex gap-2 w-full md:w-auto">
+            <div className="flex gap-2 w-full md:w-auto">
+              <Button
+                variant="secondary"
+                onClick={handleMessage}
+                loading={isMessaging}
+                className="flex-1 md:flex-none justify-center"
+              >
+                Message
               </Button>
-            )}
+              {connectionStatus === 'ACCEPTED' ? (
+                <Badge variant="primary" className="flex-1 md:flex-none justify-center text-center py-3">Connected</Badge>
+              ) : connectionStatus === 'PENDING' ? (
+                <Badge variant="warning" className="flex-1 md:flex-none justify-center text-center py-3">Request Sent</Badge>
+              ) : (
+                <Button onClick={handleConnect} loading={isConnecting} className="flex-1 md:flex-none justify-center">
+                  Connect
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 

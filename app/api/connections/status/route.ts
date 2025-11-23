@@ -30,6 +30,17 @@ export async function GET() {
           id: true,
           senderId: true,
           status: true,
+          sender: {
+            select: {
+              id: true,
+              profile: {
+                select: {
+                  name: true,
+                  city: true,
+                }
+              }
+            }
+          }
         },
       }),
     ])

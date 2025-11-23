@@ -88,6 +88,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
             src={regularPost.imageUrl}
             alt={regularPost.content || 'Post image'}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
           />
           {regularPost.content && (
@@ -121,6 +122,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           src={eventPost.imageUrl}
           alt={eventPost.title}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3">
@@ -163,6 +165,7 @@ export default function PostCard({ post, currentUserId }: PostCardProps) {
           src={placePost.imageUrl}
           alt={placePost.placeName}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
       </div>

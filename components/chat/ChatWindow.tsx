@@ -16,9 +16,10 @@ interface Message {
 
 interface ChatWindowProps {
     conversationId: string
+    onBack?: () => void
 }
 
-export default function ChatWindow({ conversationId }: ChatWindowProps) {
+export default function ChatWindow({ conversationId, onBack }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([])
     const [newMessage, setNewMessage] = useState('')
     const [loading, setLoading] = useState(true)
@@ -87,6 +88,16 @@ export default function ChatWindow({ conversationId }: ChatWindowProps) {
             {/* Header */}
             <div className="p-4 border-b border-white/5 flex justify-between items-center bg-card/50 backdrop-blur-sm">
                 <div className="flex items-center gap-3">
+                    {/* Back Button (Mobile Only) */}
+                    <button
+                        onClick={onBack}
+                        className="md:hidden p-2 -ml-2 hover:bg-white/5 rounded-full text-muted-foreground"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
                         <span className="text-sm font-bold text-primary">C</span>
                     </div>

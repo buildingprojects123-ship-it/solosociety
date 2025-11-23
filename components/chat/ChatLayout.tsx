@@ -18,12 +18,12 @@ export default function ChatLayout() {
 
     return (
         <div className="flex h-full overflow-hidden bg-background">
-            <div className="w-80 shrink-0 hidden md:block">
+            <div className={`w-full md:w-80 shrink-0 ${selectedId ? 'hidden md:block' : 'block'}`}>
                 <ConversationList selectedId={selectedId} onSelect={setSelectedId} />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className={`flex-1 min-w-0 ${!selectedId ? 'hidden md:block' : 'block'}`}>
                 {selectedId ? (
-                    <ChatWindow conversationId={selectedId} />
+                    <ChatWindow conversationId={selectedId} onBack={() => setSelectedId(undefined)} />
                 ) : (
                     <div className="h-full flex items-center justify-center text-muted-foreground">
                         Select a conversation to start chatting

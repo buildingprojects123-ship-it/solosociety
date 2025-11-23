@@ -31,6 +31,17 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
     outgoing: {},
     incoming: {},
   })
+  const [incomingRequests, setIncomingRequests] = useState<Array<{
+    id: string
+    senderId: string
+    sender: {
+      id: string
+      profile: {
+        name: string
+        city: string
+      } | null
+    }
+  }>>([])
 
   const fetchConnectionStatus = useCallback(async () => {
     try {
@@ -39,6 +50,7 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
       const data = await response.json()
       const outgoingMap: Record<string, string> = {}
       const incomingMap: Record<string, string> = {}
+      const pendingRequests: typeof incomingRequests = []
 
         ; (data.outgoing || []).forEach((entry: any) => {
           outgoingMap[entry.receiverId] = entry.status
@@ -46,9 +58,13 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
 
         ; (data.incoming || []).forEach((entry: any) => {
           incomingMap[entry.senderId] = entry.status
+          if (entry.status === 'PENDING') {
+            pendingRequests.push(entry)
+          }
         })
 
       setConnectionStatus({ outgoing: outgoingMap, incoming: incomingMap })
+      setIncomingRequests(pendingRequests)
     } catch (err) {
       console.error('Failed to fetch connection status', err)
     }
@@ -109,11 +125,27 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
     }
   }
 
+  const handleResponse = async (requestId: string, action: 'accept' | 'decline') => {
+    try {
+      const response = await fetch('/api/connections/respond', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, action }),
+      })
+
+      if (response.ok) {
+        fetchConnectionStatus()
+      }
+    } catch (error) {
+      console.error('Error responding to request:', error)
+    }
+  }
+
   const Container = variant === 'desktop' ? 'aside' : 'section'
 
   const containerClasses =
     variant === 'desktop'
-      ? 'hidden xl:flex flex-col w-80 space-y-6 sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto scrollbar-hide pr-2'
+      ? 'hidden xl:flex flex-col w-80 space-y-6' // Removed sticky/fixed here as it's handled by parent layout now
       : 'space-y-6'
 
   if (isLoading) {
@@ -151,6 +183,53 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
 
   return (
     <Container className={containerClasses}>
+      {/* Connection Requests Panel */}
+      {incomingRequests.length > 0 && (
+        <SidebarPanel title="Connection Requests" actionLabel={`${incomingRequests.length} pending`}>
+          <div className="space-y-3">
+            {incomingRequests.map((req) => (
+              <div key={req.id} className="flex items-center justify-between gap-2">
+                <Link href={`/profile/${req.senderId}`} className="flex items-center gap-2 min-w-0">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary text-xs font-bold">
+                      {req.sender.profile?.name?.charAt(0) || '?'}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {req.sender.profile?.name || 'User'}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      {req.sender.profile?.city || 'Unknown city'}
+                    </p>
+                  </div>
+                </Link>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleResponse(req.id, 'accept')}
+                    className="p-1.5 text-green-400 hover:bg-green-400/10 rounded-md transition-colors"
+                    title="Accept"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleResponse(req.id, 'decline')}
+                    className="p-1.5 text-red-400 hover:bg-red-400/10 rounded-md transition-colors"
+                    title="Decline"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SidebarPanel>
+      )}
+
       <SidebarPanel title="This weekend's picks">
         {sidebarData.weekendEvents.length === 0 ? (
           <p className="text-xs text-muted-foreground">No events this week. Check back soon!</p>
@@ -168,6 +247,7 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
                       src={event.imageUrl}
                       alt={event.title}
                       fill
+                      sizes="80px"
                       className="object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
@@ -271,20 +351,14 @@ export default function RightSidebar({ variant = 'desktop' }: RightSidebarProps)
                       Connected
                     </span>
                   ) : incomingStatus === 'PENDING' ? (
-                    <button
-                      type="button"
-                      onClick={() => router.push('/feed/notifications')}
-                      className="px-3 py-1.5 text-sm font-medium rounded-lg text-primary hover:bg-primary/10"
-                    >
-                      Respond
-                    </button>
+                    <span className="text-xs text-muted-foreground">Pending</span>
                   ) : (
                     <button
                       onClick={() => handleConnect(user.id)}
                       disabled={isRequestSent}
                       className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${isRequestSent
-                          ? 'bg-white/5 text-muted-foreground cursor-not-allowed'
-                          : 'text-primary hover:bg-primary/10'
+                        ? 'bg-white/5 text-muted-foreground cursor-not-allowed'
+                        : 'text-primary hover:bg-primary/10'
                         }`}
                     >
                       {isRequestSent ? 'Sent' : 'Connect'}
